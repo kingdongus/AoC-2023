@@ -1,2 +1,2 @@
-# AoC2023
+# AoC 2023
 Advent of code 2023 in Python
