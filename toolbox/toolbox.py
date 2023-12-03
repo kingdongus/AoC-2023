@@ -13,5 +13,5 @@ def read_file_into_2d_array(file_path):
         return None
 
 
-def in_range(index, list):
-    return -1 < index < len(list)
+def in_range(index, array):
+    return -1 < index < len(array)
