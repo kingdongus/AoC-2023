@@ -1,5 +1,5 @@
 number_strings = [str(i) for i in range(10)]
-directions = [(x, y) for x in [-1, 0, 1] for y in [-1, 0, 1] if not (x == 0 and y == 0)]
+directions_2d = [(x, y) for x in [-1, 0, 1] for y in [-1, 0, 1] if not (x == 0 and y == 0)]
 
 input_file_name = 'input.txt'
 

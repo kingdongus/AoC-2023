@@ -1,4 +1,4 @@
-from toolbox.toolbox import read_file_into_2d_array, directions, number_strings, in_range
+from toolbox.toolbox import read_file_into_2d_array, directions_2d, number_strings, in_range
 
 
 def part_1(problem):
@@ -10,7 +10,7 @@ def part_1(problem):
         for x in range(len(problem[y])):
             if problem[y][x] not in numbers and problem[y][x] not in ['.', '\n']:
                 # check in all directions to see if we find numbers
-                for direction in directions:
+                for direction in directions_2d:
                     direction_new_x = x + direction[0]
                     direction_new_y = y + direction[1]
                     if in_range(direction_new_x, problem[y]) and in_range(direction_new_y, problem) and \
@@ -43,7 +43,7 @@ def part_2(problem):
             if problem[y][x] == '*':
                 # check in all directions to see if we find numbers
                 surrounding_numbers = []
-                for direction in directions:
+                for direction in directions_2d:
                     direction_new_x = x + direction[0]
                     direction_new_y = y + direction[1]
                     if in_range(direction_new_x, problem[y]) and in_range(direction_new_y, problem) and \
