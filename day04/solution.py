@@ -22,8 +22,7 @@ def part_1(problem):
     for line in problem:
         lists = extract_lists(line)
         len_intersection = len(list(set(lists[0]) & set(lists[1])))
-        new_score = 2 ** (len_intersection - 1) if len_intersection > 0 else 0
-        score += new_score
+        score += 2 ** (len_intersection - 1) if len_intersection else 0
 
     return score
 
@@ -37,7 +36,7 @@ def part_2(problem, line_count):
 
         for i in range(idx + 1, idx + len(intersection) + 1):
             if copies[i] is not None:
-                copies[i] = copies[i] + copies[idx]
+                copies[i] += copies[idx]
 
         idx += 1
 
