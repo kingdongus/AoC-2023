@@ -61,11 +61,17 @@ class Range:
         xored.append(self.logical_and(other))
         return sorted(xored, key=lambda x: x.start)
 
+    def copy(self):
+        return Range(self.start, self.end)
+
     def __eq__(self, other):
         return self.start == other.start and self.end == other.end
 
     def __contains__(self, other):
-        return other.start >= self.start and other.end <= self.end
+        if isinstance(other, Range):
+            return other.start >= self.start and other.end <= self.end
+        elif isinstance(other, int):
+            return self.start <= other <= self.end
 
     def __repr__(self):
         return f'[{self.start} - {self.end}]'
@@ -90,6 +96,7 @@ if __name__ == '__main__':
     print(Range(1, 10).logical_and(Range(5, 20)))  # [5,10]
     print(Range(5, 20).logical_and(Range(1, 10)))  # [5,10]
 
+    print('>>>>>>>>>>>> contains (range)')
     print(Range(1, 2) in Range(0, 3))  # true
     print(Range(1, 2) in Range(2, 3))  # false
     print(Range(1, 2) in Range(1, 2))  # true
@@ -97,6 +104,13 @@ if __name__ == '__main__':
     print(Range(0, 3) in Range(1, 2))  # false
     print(Range(2, 3) in Range(1, 2))  # false
 
+    print('>>>>>>>>>>>> contains int')
+    print(1 in Range(0, 1))  # true
+    print(0 in Range(0, 1))  # true
+    print(1 in Range(0, 2))  # true
+    print(1 in Range(2, 3))  # false
+
+    print('>>>>>>>>>>>> logical or')
     print(Range(1, 2).logical_or(Range(2, 3)))  # [[1,3]]
     print(Range(1, 2).logical_or(Range(3, 4)))  # [[1,2], [3,4]]
     print(Range(1, 3).logical_or(Range(2, 4)))  # [1,4]
