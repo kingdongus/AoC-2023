@@ -38,6 +38,27 @@ class Rule:
         return self.__repr__()
 
 
+def extract_seeds_and_rules(data):
+    blocks = re.split(r'\n\w+-to-\w+ map:\n', data)
+    seeds = []
+    grouped = []
+    for block in blocks:
+        if block:
+            lines = block.split('\n')
+            lines = [line.strip() for line in lines if line.strip()]
+            rules = []
+            for line in lines:
+                numbers = re.findall(r'\d+', line)
+                numbers = list(map(int, numbers))
+                if len(numbers) != 3:
+                    seeds = numbers  # low IQ
+                else:
+                    rules.append(Rule(numbers[1], numbers[2], numbers[0]))
+            if rules:
+                grouped.append(rules)
+    return grouped, seeds
+
+
 def part_1(problem):
     grouped_rules, seeds = extract_seeds_and_rules(problem.read())
 
@@ -52,27 +73,6 @@ def part_1(problem):
         new_seeds.append(seed)
 
     return min(new_seeds)
-
-
-def extract_seeds_and_rules(data):
-    blocks = re.split(r'\n\w+-to-\w+ map:\n', data)
-    seeds = []
-    grouped = []
-    for block in blocks:
-        if block:
-            lines = block.split('\n')
-            lines = [line.strip() for line in lines if line.strip()]
-            rules = []
-            for line in lines:
-                numbers = re.findall(r'\d+', line)
-                numbers = list(map(int, numbers))
-                if len(numbers) != 3:
-                    seeds = numbers
-                else:
-                    rules.append(Rule(numbers[1], numbers[2], numbers[0]))
-            if rules:
-                grouped.append(rules)
-    return grouped, seeds
 
 
 def part_2(problem):

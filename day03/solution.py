@@ -1,6 +1,8 @@
 from toolbox.toolbox import read_file_into_2d_array, directions_2d, number_strings, in_range
 
 
+# idea for both parts: we don't scan for numbers, we scan for symbols
+# if we find a symbol, we search for numbers in the direct vicinity
 def part_1(problem):
     numbers = [str(i) for i in range(10)]
 
