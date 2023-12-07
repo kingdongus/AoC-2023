@@ -4,8 +4,8 @@ from functools import cmp_to_key
 
 from toolbox.toolbox import input_file_name
 
-strength_order = ['A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2']
-strength_order_with_joker = ['A', 'K', 'Q', 'T', '9', '8', '7', '6', '5', '4', '3', '2', 'J']
+strength_order_part_1 = ['A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2']
+strength_order_part_2 = ['A', 'K', 'Q', 'T', '9', '8', '7', '6', '5', '4', '3', '2', 'J']
 
 
 def parse_cards_and_bids(data):
@@ -17,9 +17,9 @@ def parse_cards_and_bids(data):
     return ret
 
 
-def is_full_house(cards):
+def is_full_house(hand):
     counts = {}
-    for card in cards:
+    for card in hand:
         counts[card] = counts.get(card, 0) + 1
     values = list(counts.values())
     return sorted(values) == [2, 3]
@@ -27,17 +27,10 @@ def is_full_house(cards):
 
 def is_two_pair(hand):
     counts = {}
-
     for card in hand:
         counts[card] = counts.get(card, 0) + 1
-
-    pair_count = 0
-
-    for count in counts.values():
-        if count == 2:
-            pair_count += 1
-
-    return pair_count == 2
+    values = list(counts.values())
+    return sorted(values) == [1, 2, 2]
 
 
 def is_n_of_a_kind(hand, n):
@@ -53,20 +46,20 @@ def is_n_of_a_kind(hand, n):
     return False
 
 
-def is_five_of_a_kind(cards):
-    return is_n_of_a_kind(cards, 5)
+def is_five_of_a_kind(hand):
+    return is_n_of_a_kind(hand, 5)
 
 
-def is_four_of_a_kind(cards):
-    return is_n_of_a_kind(cards, 4)
+def is_four_of_a_kind(hand):
+    return is_n_of_a_kind(hand, 4)
 
 
-def is_three_of_a_kind(cards):
-    return is_n_of_a_kind(cards, 3)
+def is_three_of_a_kind(hand):
+    return is_n_of_a_kind(hand, 3)
 
 
-def is_one_pair(cards):
-    return is_n_of_a_kind(cards, 2)
+def is_one_pair(hand):
+    return is_n_of_a_kind(hand, 2)
 
 
 relative_strength_functions = [is_five_of_a_kind,
@@ -77,8 +70,8 @@ relative_strength_functions = [is_five_of_a_kind,
                                is_one_pair]
 
 
-def has_higher_card(hand1, hand2):
-    for a, b in zip(hand1, hand2):
+def has_higher_card(hand_1, hand_2, strength_order):
+    for a, b in zip(hand_1, hand_2):
         if strength_order.index(a) < strength_order.index(b):
             return 1
         elif strength_order.index(a) > strength_order.index(b):
@@ -86,21 +79,17 @@ def has_higher_card(hand1, hand2):
     return 0
 
 
+def has_higher_card_part_1(hand1, hand2):
+    return has_higher_card(hand1, hand2, strength_order_part_1)
+
+
 def has_higher_card_part_2(hand1, hand2):
-    for a, b in zip(hand1, hand2):
-        if strength_order_with_joker.index(a) < strength_order_with_joker.index(b):
-            print(f'{hand1} beats {hand2} via high card')
-            return 1
-        elif strength_order_with_joker.index(a) > strength_order_with_joker.index(b):
-            print(f'{hand2} beats {hand1} via high card')
-            return -1
-    print(f'{hand1} and {hand2} SAME STRENGTH via high card')
-    return 0
+    return has_higher_card(hand1, hand2, strength_order_part_2)
 
 
-def card_comparator(first, second):
-    strength_first = determine_hand_strength(first)
-    strength_second = determine_hand_strength(second)
+def hand_comparator_part_1(hand_1, hand_2):
+    strength_first = determine_hand_strength(hand_1)
+    strength_second = determine_hand_strength(hand_2)
 
     if strength_first < strength_second:
         return 1
@@ -108,26 +97,23 @@ def card_comparator(first, second):
     if strength_first > strength_second:
         return -1
 
-    return has_higher_card(first, second)
+    return has_higher_card_part_1(hand_1, hand_2)
 
 
-def determine_hand_strength(first):
+def determine_hand_strength(hand):
     strength_first = sys.maxsize
     idx = 0
     for f in relative_strength_functions:
-        if f(first):
+        if f(hand):
             strength_first = idx
             break
         idx += 1
     return strength_first
 
 
-def card_comparator_part_2(first, second):
-    modified_first = replace_jokers(first)
-    modified_second = replace_jokers(second)
-
-    strength_first = determine_hand_strength(modified_first)
-    strength_second = determine_hand_strength(modified_second)
+def hand_comparator_part_2(hand_1, hand_2):
+    strength_first = determine_hand_strength(replace_jokers(hand_1))
+    strength_second = determine_hand_strength(replace_jokers(hand_2))
 
     if strength_first < strength_second:
         return 1
@@ -135,7 +121,7 @@ def card_comparator_part_2(first, second):
     if strength_first > strength_second:
         return -1
 
-    return has_higher_card_part_2(first, second)
+    return has_higher_card_part_2(hand_1, hand_2)
 
 
 def replace_jokers(hand):
@@ -146,33 +132,31 @@ def replace_jokers(hand):
     if num_jokers == 5:
         return ['A', 'A', 'A', 'A', 'A']
 
+    # get card that is most common, tie-break for highest value
     hand_without_jokers = list(filter(lambda a: a != 'J', hand))
+    num_most_common = Counter(hand_without_jokers).most_common(1)[0][1]
+    most_common_highest_value = sorted(list(
+        set([x for x in hand_without_jokers if hand_without_jokers.count(x) == num_most_common])),
+        key=lambda x: strength_order_part_1.index(x))[0]
 
-    counter = Counter(hand_without_jokers)
-    num_most_common = counter.most_common(1)[0][1]
-    all_most_common_elements = list(
-        set([x for x in hand_without_jokers if hand_without_jokers.count(x) == num_most_common]))
-    all_most_common_elements.sort(key=lambda x: strength_order.index(x))
-
+    # replace jokers with most common highest value card
     modified = hand[::]
     for i in range(len(modified)):
         if modified[i] == 'J':
-            modified[i] = all_most_common_elements[0]
-    print(f'from {hand} to {modified}')
+            modified[i] = most_common_highest_value
     return modified
 
 
-def hand_comparator(first, second):
-    return card_comparator(first[0], second[0])
+def comparator_part_1(first, second):
+    return hand_comparator_part_1(first[0], second[0])
 
 
-def hand_comparator_part_2(first, second):
-    return card_comparator_part_2(first[0], second[0])
+def comparator_part_2(first, second):
+    return hand_comparator_part_2(first[0], second[0])
 
 
 def part_1(problem):
-    cards_and_bids = parse_cards_and_bids(problem)
-    cards_and_bids.sort(key=cmp_to_key(hand_comparator))
+    cards_and_bids = sorted(parse_cards_and_bids(problem), key=cmp_to_key(comparator_part_1))
 
     idx = 1
     s = 0
@@ -184,8 +168,7 @@ def part_1(problem):
 
 
 def part_2(problem):
-    cards_and_bids = parse_cards_and_bids(problem)
-    cards_and_bids.sort(key=cmp_to_key(hand_comparator_part_2))
+    cards_and_bids = sorted(parse_cards_and_bids(problem), key=cmp_to_key(comparator_part_2))
 
     idx = 1
     s = 0
@@ -197,15 +180,8 @@ def part_2(problem):
 
 
 if __name__ == '__main__':
-    # print(replace_jokers(list('55JKK')))
-    # print(replace_jokers(list('55AKK')))
-    # print(replace_jokers(list('JJJJJ')))
-
-    # ['J', '4', '4', '9', '4'] beats ['8', 'A', '8', '8', 'J'] via high card
-    print(has_higher_card_part_2(['J', '4', '4', '9', '4'], ['8', 'A', '8', '8', 'J']))
-    print(has_higher_card_part_2(['8', 'A', '8', '8', 'J'], ['J', '4', '4', '9', '4']))
-    # with open(input_file_name) as problem:  # 251106089
-    #     print(part_1(problem))
-    #
     with open(input_file_name) as problem:
-        print(part_2(problem))  # 250684437 too high, 250035895 too high
+        print(part_1(problem))
+
+    with open(input_file_name) as problem:
+        print(part_2(problem))
