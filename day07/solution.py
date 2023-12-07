@@ -12,7 +12,7 @@ def parse_cards_and_bids(data):
     ret = []
     for line in data:
         s = line.replace('\n', '')
-        s = line.split(' ')
+        s = s.split(' ')
         ret.append((list(s[0]), int(s[1])))
     return ret
 
@@ -88,10 +88,13 @@ def has_higher_card(hand1, hand2):
 
 def has_higher_card_part_2(hand1, hand2):
     for a, b in zip(hand1, hand2):
-        if strength_order_with_joker.index(a) < strength_order.index(b):
+        if strength_order_with_joker.index(a) < strength_order_with_joker.index(b):
+            print(f'{hand1} beats {hand2} via high card')
             return 1
-        elif strength_order_with_joker.index(a) > strength_order.index(b):
+        elif strength_order_with_joker.index(a) > strength_order_with_joker.index(b):
+            print(f'{hand2} beats {hand1} via high card')
             return -1
+    print(f'{hand1} and {hand2} SAME STRENGTH via high card')
     return 0
 
 
@@ -152,11 +155,10 @@ def replace_jokers(hand):
     all_most_common_elements.sort(key=lambda x: strength_order.index(x))
 
     modified = hand[::]
-    if num_jokers != 0:
-        for i in range(len(modified)):
-            if modified[i] == 'J':
-                modified[i] = all_most_common_elements[0]
-    # print(f'from {hand} to {modified}')
+    for i in range(len(modified)):
+        if modified[i] == 'J':
+            modified[i] = all_most_common_elements[0]
+    print(f'from {hand} to {modified}')
     return modified
 
 
@@ -198,8 +200,12 @@ if __name__ == '__main__':
     # print(replace_jokers(list('55JKK')))
     # print(replace_jokers(list('55AKK')))
     # print(replace_jokers(list('JJJJJ')))
-    with open(input_file_name) as problem:  # 251106089
-        print(part_1(problem))
 
+    # ['J', '4', '4', '9', '4'] beats ['8', 'A', '8', '8', 'J'] via high card
+    print(has_higher_card_part_2(['J', '4', '4', '9', '4'], ['8', 'A', '8', '8', 'J']))
+    print(has_higher_card_part_2(['8', 'A', '8', '8', 'J'], ['J', '4', '4', '9', '4']))
+    # with open(input_file_name) as problem:  # 251106089
+    #     print(part_1(problem))
+    #
     with open(input_file_name) as problem:
         print(part_2(problem))  # 250684437 too high, 250035895 too high
