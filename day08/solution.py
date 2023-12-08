@@ -41,15 +41,14 @@ def all_end_with_z(strings):
 
 def part_1(problem):
     instructions, network = parse_graph(problem)
-    current_node = 'AAA'
-    return find_path_for_node(current_node, instructions, network, lambda x: x == 'ZZZ')
+    return find_path_for_node('AAA', instructions, network, lambda x: x == 'ZZZ')
 
 
 def part_2(problem):
     instructions, network = parse_graph(problem)
-    current_nodes = [node for node in network.keys() if node.endswith('A')]
+    starting_nodes = [node for node in network.keys() if node.endswith('A')]
     individual_solutions = [find_path_for_node(node, instructions, network, lambda x: x.endswith('Z')) for node in
-                            current_nodes]
+                            starting_nodes]
     return lcmm(*individual_solutions)
 
 
