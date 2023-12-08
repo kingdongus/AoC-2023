@@ -4,8 +4,8 @@ from functools import cmp_to_key
 
 from toolbox.toolbox import input_file_name
 
-strength_order_part_1 = ['A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2']
-strength_order_part_2 = ['A', 'K', 'Q', 'T', '9', '8', '7', '6', '5', '4', '3', '2', 'J']
+relative_strength_part_1 = ['A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2']
+relative_strength_part_2 = ['A', 'K', 'Q', 'T', '9', '8', '7', '6', '5', '4', '3', '2', 'J']
 
 
 def parse_cards_and_bids(data):
@@ -80,11 +80,11 @@ def has_higher_card(hand_1, hand_2, strength_order):
 
 
 def has_higher_card_part_1(hand1, hand2):
-    return has_higher_card(hand1, hand2, strength_order_part_1)
+    return has_higher_card(hand1, hand2, relative_strength_part_1)
 
 
 def has_higher_card_part_2(hand1, hand2):
-    return has_higher_card(hand1, hand2, strength_order_part_2)
+    return has_higher_card(hand1, hand2, relative_strength_part_2)
 
 
 def hand_comparator_part_1(hand_1, hand_2):
@@ -137,7 +137,7 @@ def replace_jokers(hand):
     num_most_common = Counter(hand_without_jokers).most_common(1)[0][1]
     most_common_highest_value = sorted(list(
         set([x for x in hand_without_jokers if hand_without_jokers.count(x) == num_most_common])),
-        key=lambda x: strength_order_part_1.index(x))[0]
+        key=lambda x: relative_strength_part_1.index(x))[0]
 
     # replace jokers with most common highest value card
     modified = hand[::]
