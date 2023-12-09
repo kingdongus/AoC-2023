@@ -22,22 +22,14 @@ def continue_series(series):
 
 
 def part_1(problem):
-    sum = 0
-    for line in problem:
-        sum += continue_series([int(x) for x in line.split(' ')])
-    return sum
+    return sum(continue_series([int(x) for x in line.split(' ')]) for line in problem)
 
 
 def part_2(problem):
-    sum = 0
-    for line in problem:
-        sum += continue_series(list(reversed([int(x) for x in line.split(' ')])))
-    return sum
+    return sum(continue_series(list(reversed([int(x) for x in line.split(' ')]))) for line in problem)
 
 
 if __name__ == '__main__':
-    continue_series([0, 3, 6, 9, 12, 15])
-
     with open(input_file_name) as problem:
         print(part_1(problem))
     with open(input_file_name) as problem:
