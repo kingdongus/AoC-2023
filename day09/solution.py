@@ -9,16 +9,10 @@ def continue_series(series):
 
     while not deltas.count(0) == len(deltas):
         history = [deltas] + history
-        tmp = deltas
-        pairs = [(tmp[x], tmp[x + 1]) for x in range(len(tmp) - 1)]
+        pairs = [(deltas[x], deltas[x + 1]) for x in range(len(deltas) - 1)]
         deltas = [b - a for a, b in pairs]
 
-    increment_by = 0
-    while history:
-        next_series = history.pop()
-        increment_by = next_series[-1] + increment_by
-
-    return increment_by
+    return sum(s[-1] for s in history)
 
 
 def part_1(problem):
