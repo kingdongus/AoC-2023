@@ -80,7 +80,7 @@ def part_2(problem):
             break
 
     cleanup_bad_pipes(loop_tiles, problem)
-    problem[start[0]][start[1]] = find_replacement_for_S(loop_tiles, problem, start)
+    problem[start[0]][start[1]] = find_replacement_for_start(loop_tiles, problem, start)
 
     count = 0
     # crossing
@@ -102,7 +102,7 @@ def cleanup_bad_pipes(loop_tiles, problem):
                 problem[row][col] = '.'
 
 
-def find_replacement_for_S(loop_tiles, problem, start):
+def find_replacement_for_start(loop_tiles, problem, start):
     has_incoming_left = (start[0], start[1] - 1) in loop_tiles and problem[start[0]][start[1] - 1] in list('-LF')
     has_incoming_right = (start[0], start[1] + 1) in loop_tiles and problem[start[0]][start[1] + 1] in list('-J7')
     has_incoming_top = (start[0] - 1, start[1]) in loop_tiles and problem[start[0] - 1][start[1]] in list('7F|')
