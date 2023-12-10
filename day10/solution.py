@@ -10,7 +10,7 @@ connections_per_pipe = {
     '7': [(1, 0), (0, -1)],
     'F': [(1, 0), (0, 1)],
     '.': [],
-    'S': [direction for direction in toolbox.toolbox.directions_2d_8],
+    'S': toolbox.toolbox.directions_2d_8[::],
 }
 
 
@@ -33,16 +33,15 @@ def follow_path_and_record_length(previous, current, map):
         depth += 1
 
 
-def follow_and_memorize_path(previous, current, map):
+def follow_and_memorize_path(previous, current, tiles):
     path = [previous, current]
     while True:
-        current_pipe = map[current[0]][current[1]]
+        current_pipe = tiles[current[0]][current[1]]
         if current_pipe == 'S':
             return path
         candidates = [(current[0] + d[0], current[1] + d[1]) for d in (connections_per_pipe[current_pipe])]
         candidates = [candidate for candidate in candidates if candidate != previous
-                      and in_range(candidate[0], map) and in_range(candidate[1], map[1])]
-        print(current, current_pipe, connections_per_pipe[current_pipe], candidates)
+                      and in_range(candidate[0], tiles) and in_range(candidate[1], tiles[1])]
 
         if not candidates:
             return []
@@ -52,13 +51,10 @@ def follow_and_memorize_path(previous, current, map):
 
 
 def find_start(problem):
-    start = (-1, -1)
     for row_idx in range(len(problem)):
         for col_idx in range(len(problem[0])):
             if problem[row_idx][col_idx] == 'S':
-                start = (row_idx, col_idx)
-                break
-    return start
+                return row_idx, col_idx
 
 
 def part_1(problem):
@@ -70,28 +66,47 @@ def part_1(problem):
 
 def part_2(problem):
     start = find_start(problem)
-    print(f"start: {start}")
-    for direction in [(0, 1)]:
-        loop_tiles = follow_and_memorize_path(start, (start[0] + direction[0], start[1] + direction[1]), problem)
+    for direction in toolbox.toolbox.directions_2d_4:
+        # check whether a surrounding tile actually connects to start
+        adjacent_x = start[0] + direction[0]
+        adjacent_y = start[1] + direction[1]
+        if start not in [(adjacent_x + d[0], adjacent_y + d[1]) for d in
+                         connections_per_pipe[problem[adjacent_x][adjacent_y]]]:
+            continue
+
+        adjacent = (adjacent_x, adjacent_y)
+        loop_tiles = follow_and_memorize_path(start, adjacent, problem)
         if loop_tiles:
             break
-    print(f'path length: {len(loop_tiles)}')
 
-    # cleanup bad pipes
+    cleanup_bad_pipes(loop_tiles, problem)
+    problem[start[0]][start[1]] = find_replacement_for_S(loop_tiles, problem, start)
+
+    count = 0
+    # crossing
+    for row in range(len(problem)):
+        crossed = 0
+        for col in range(len(problem[0])):
+            if problem[row][col] in list('|LJ'):
+                crossed += 1
+            elif problem[row][col] == '.':
+                if crossed % 2 == 1:
+                    count += 1
+    return count
+
+
+def cleanup_bad_pipes(loop_tiles, problem):
     for row in range(len(problem)):
         for col in range(len(problem[0])):
             if (row, col) not in loop_tiles:
                 problem[row][col] = '.'
 
-    for row in problem:
-        print(''.join(row))
 
-    # replace s
+def find_replacement_for_S(loop_tiles, problem, start):
     has_incoming_left = (start[0], start[1] - 1) in loop_tiles and problem[start[0]][start[1] - 1] in list('-LF')
     has_incoming_right = (start[0], start[1] + 1) in loop_tiles and problem[start[0]][start[1] + 1] in list('-J7')
     has_incoming_top = (start[0] - 1, start[1]) in loop_tiles and problem[start[0] - 1][start[1]] in list('7F|')
     has_incoming_bottom = (start[0] + 1, start[1]) in loop_tiles and problem[start[0] + 1][start[1]] in list('|LJ')
-
     replacement = '.'
     if has_incoming_top and has_incoming_right:
         replacement = 'L'
@@ -105,28 +120,7 @@ def part_2(problem):
         replacement = '7'
     elif has_incoming_bottom and has_incoming_right:
         replacement = 'F'
-
-    problem[start[0]][start[1]] = replacement
-
-    count = 0
-    # crossing
-    for row in range(len(problem)):
-        crossed = 0
-        for col in range(len(problem[0])):
-            found = False
-            if problem[row][col] in list('|LJ'):
-                crossed += 1
-            elif problem[row][col] == '.':
-                if crossed % 2 == 1:
-                    found = True
-                    count += 1
-                    problem[row][col] = 'X'
-            if not found:
-                problem[row][col] = ' '
-
-    for row in problem:
-        print(''.join(row))
-    return count
+    return replacement
 
 
 if __name__ == '__main__':
