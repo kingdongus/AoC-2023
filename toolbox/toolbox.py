@@ -7,6 +7,10 @@ directions_2d_4 = [(1, 0), (-1, 0), (0, 1), (0, -1)]
 input_file_name = 'input.txt'
 
 
+def manhattan_distance(a, b):
+    return abs(a[0] - b[0]) + abs(a[1] - b[1])
+
+
 def read_file_into_2d_array(file_path):
     try:
         with open(file_path, 'r') as file:

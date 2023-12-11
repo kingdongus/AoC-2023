@@ -66,7 +66,7 @@ def part_1(problem):
 
 def part_2(problem):
     start = find_start(problem)
-    for direction in toolbox.toolbox.directions_2d_4:
+    for direction in connections_per_pipe['S']:
         # check whether a surrounding tile actually connects to start
         adjacent_x = start[0] + direction[0]
         adjacent_y = start[1] + direction[1]
