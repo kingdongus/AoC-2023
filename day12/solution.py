@@ -19,10 +19,9 @@ def solve(line, expansion_factor):
             result = solve_rec(spring_index + 1, constraint_index)
 
         # case 2: we have a # or ?, so let's check if we can find enough consecutive # or ? to consume the next constraint
-        if constraint_index < len(constraints):
+        if constraint_index < len(constraints) and springs[spring_index] != '.':
             spring_index_after_next_constraint = spring_index + constraints[constraint_index]
-            if (springs[spring_index] != '.'
-                    and '.' not in springs[spring_index:spring_index_after_next_constraint]  # no . on the way
+            if ('.' not in springs[spring_index:spring_index_after_next_constraint]  # no . on the way
                     and '#' != springs[
                         spring_index_after_next_constraint]):  # we must not have another # right after the jump
                 result += solve_rec(spring_index_after_next_constraint + 1, constraint_index + 1)
@@ -45,6 +44,3 @@ if __name__ == '__main__':
         print(part_1(problem))
     with open(input_file_name) as problem:
         print(part_2(problem))
-
-# 7857
-# 28606137449920
