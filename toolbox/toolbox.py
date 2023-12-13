@@ -24,6 +24,13 @@ def in_range(index, array):
     return -1 < index < len(array)
 
 
+def transpose_list_of_strings(chunk):
+    transposed = []
+    for i in range(len(chunk[0])):
+        transposed.append(''.join([x[i] for x in chunk]))
+    return transposed
+
+
 def gcd(a, b):
     """Return greatest common divisor using Euclid's Algorithm."""
     while b:
