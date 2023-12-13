@@ -28,7 +28,7 @@ def find_horizontal_axis(chunk):
 
 
 def find_vertical_axis_v2(chunk):
-    # find the one that is almost good enough
+    # find the one that is almost good enough, i.a. that would make a valid reflection axis for almost all lines in a chunk
     candidates_all_lines = {x: 0 for x in range(1, len(chunk[0]))}
     for line in chunk:
         candidates_per_line = find_candidates(line)
@@ -43,42 +43,20 @@ def find_horizontal_axis_v2(chunk):
     return find_vertical_axis_v2(transpose_list_of_strings(chunk))
 
 
-def part_1(problem):
+def split_into_chunks(problem):
     chunks = problem.split('\n\n')
     for i in range(len(chunks)):
         chunks[i] = chunks[i].split('\n')
+    return chunks
 
-    result = 0
-    for chunk in chunks:
-        va = find_vertical_axis(chunk)
-        if va:
-            result += va
-            continue
-        ha = find_horizontal_axis(chunk)
-        if ha:
-            result += 100 * ha
-            continue
-        assert result
-    return result
+
+def part_1(problem):
+    return sum(find_vertical_axis(chunk) + find_horizontal_axis(chunk) * 100 for chunk in (split_into_chunks(problem)))
 
 
 def part_2(problem):
-    chunks = problem.split('\n\n')
-    for i in range(len(chunks)):
-        chunks[i] = chunks[i].split('\n')
-
-    result = 0
-    for chunk in chunks:
-        va = find_vertical_axis_v2(chunk)
-        if va:
-            result += va
-            continue
-        ha = find_horizontal_axis_v2(chunk)
-        if ha:
-            result += 100 * ha
-            continue
-        assert result
-    return result
+    return sum(
+        find_vertical_axis_v2(chunk) + find_horizontal_axis_v2(chunk) * 100 for chunk in split_into_chunks(problem))
 
 
 if __name__ == '__main__':
