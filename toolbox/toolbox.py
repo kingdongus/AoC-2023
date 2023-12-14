@@ -1,8 +1,14 @@
 from functools import reduce
 
 number_strings = [str(i) for i in range(10)]
+
+direction_north = (-1, 0)
+direction_west = (0, -1)
+direction_south = (1, 0)
+direction_east = (0, 1)
+
+directions_2d_4 = [direction_north, direction_east, direction_south, direction_west]
 directions_2d_8 = [(x, y) for x in [-1, 0, 1] for y in [-1, 0, 1] if not (x == 0 and y == 0)]
-directions_2d_4 = [(1, 0), (-1, 0), (0, 1), (0, -1)]
 
 input_file_name = 'input.txt'
 
