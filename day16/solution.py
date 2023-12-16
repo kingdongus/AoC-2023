@@ -17,44 +17,47 @@ def calc_for(problem, start):
 
         memory.add((location, direction))
         energized.add(location)
-        new_location = (location[0] + direction[0], location[1] + direction[1])
 
-        if not in_range(new_location[0], problem) or not in_range(new_location[1], problem[0]):
+        if not in_range(location[0], problem) or not in_range(location[1], problem[0]):
             continue
 
-        tile = problem[new_location[0]][new_location[1]]
+        tile = problem[location[0]][location[1]]
         if tile == '.':
-            rays.append((new_location, direction))
+            rays.append(((location[0] + direction[0], location[1] + direction[1]), direction))
         elif tile == '/':
+            new_direction = direction
             if direction == direction_north:
-                rays.append((new_location, direction_east))
+                new_direction = direction_east
             elif direction == direction_east:
-                rays.append((new_location, direction_north))
+                new_direction = direction_north
             elif direction == direction_south:
-                rays.append((new_location, direction_west))
+                new_direction = direction_west
             elif direction == direction_west:
-                rays.append((new_location, direction_south))
+                new_direction = direction_south
+            rays.append(((location[0] + new_direction[0], location[1] + new_direction[1]), new_direction))
         elif tile == '\\':
+            new_direction = direction
             if direction == direction_north:
-                rays.append((new_location, direction_west))
+                new_direction = direction_west
             elif direction == direction_east:
-                rays.append((new_location, direction_south))
+                new_direction = direction_south
             elif direction == direction_south:
-                rays.append((new_location, direction_east))
+                new_direction = direction_east
             elif direction == direction_west:
-                rays.append((new_location, direction_north))
+                new_direction = direction_north
+            rays.append(((location[0] + new_direction[0], location[1] + new_direction[1]), new_direction))
         elif tile == '-':
             if direction == direction_north or direction == direction_south:
-                rays.append((new_location, direction_east))
-                rays.append((new_location, direction_west))
+                rays.append(((location[0] + direction_east[0], location[1] + direction_east[1]), direction_east))
+                rays.append(((location[0] + direction_west[0], location[1] + direction_west[1]), direction_west))
             else:
-                rays.append((new_location, direction))
+                rays.append(((location[0] + direction[0], location[1] + direction[1]), direction))
         elif tile == '|':
             if direction == direction_east or direction == direction_west:
-                rays.append((new_location, direction_north))
-                rays.append((new_location, direction_south))
+                rays.append(((location[0] + direction_north[0], location[1] + direction_north[1]), direction_north))
+                rays.append(((location[0] + direction_south[0], location[1] + direction_south[1]), direction_south))
             else:
-                rays.append((new_location, direction))
+                rays.append(((location[0] + direction[0], location[1] + direction[1]), direction))
 
     return len(energized) - 1  # not sure where this comes from 🤡
 
