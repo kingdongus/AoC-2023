@@ -37,12 +37,38 @@ def traverse(city):
             heappush(work, (new_heat, (new_row, new_col), d, new_direction_count))
 
 
+def traverse_2(city):
+    seen = set()
+    work = [(0, (0, 0), direction_east, 1), (0, (0, 0), direction_south, 1)]
+
+    while work:
+        heat, position, direction, direction_count = heappop(work)
+        if (position, direction, direction_count) in seen:
+            continue
+        seen.add((position, direction, direction_count))
+
+        new_row, new_col = position[0] + direction[0], position[1] + direction[1]
+        if not in_range(new_col, city) or not in_range(new_row, city[0]):
+            continue
+        new_heat = heat + city[new_col][new_row]
+        if 4 <= direction_count <= 10:
+            if new_col == len(city) - 1 and new_row == len(city[0]) - 1:
+                return new_heat
+        for d in directions_2d_4:
+            if d == opposites[direction]:
+                continue
+            new_direction_count = direction_count + 1 if d == direction else 1
+            if (direction != d and direction_count < 4) or new_direction_count > 10:
+                continue
+            heappush(work, (new_heat, (new_row, new_col), d, new_direction_count))
+
+
 def part_1(problem):
     return traverse(problem)
 
 
 def part_2(problem):
-    pass
+    return traverse_2(problem)
 
 
 if __name__ == '__main__':
@@ -51,4 +77,4 @@ if __name__ == '__main__':
         for j in range(len(problem[0])):
             problem[i][j] = int(problem[i][j])
     print(part_1(problem))
-    print(part_2(problem))
+    print(part_2(problem))  # 627 too low, 876 too low
