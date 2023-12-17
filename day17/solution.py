@@ -11,7 +11,7 @@ opposites = {
 }
 
 
-def traverse_2(city, min_step, max_step):
+def traverse(city, min_step, max_step):
     seen = set()
     work = [(0, (0, 0), direction_east, 1), (0, (0, 0), direction_south, 1)]
 
@@ -39,11 +39,11 @@ def traverse_2(city, min_step, max_step):
 
 
 def part_1(problem):
-    return traverse_2(problem, 1, 3)
+    return traverse(problem, 1, 3)
 
 
 def part_2(problem):
-    return traverse_2(problem, 4, 10)
+    return traverse(problem, 4, 10)
 
 
 if __name__ == '__main__':
