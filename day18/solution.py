@@ -15,8 +15,8 @@ def part_1(problem):
     instructions = []
     for line in problem:
         s = line.strip().split(' ')
-        direction, distance, color = s[0], s[1], s[2]
-        instructions.append((direction, int(distance), color))
+        direction, distance, _ = s[0], s[1], s[2]
+        instructions.append((direction, int(distance)))
 
     return calculate_lagoon_2(instructions)
 
@@ -45,23 +45,23 @@ def calculate_lagoon(instructions):
     return len(visited)
 
 
+def shoelace(points):
+    return sum((i[0] + j[0]) * (i[1] - j[1]) for i, j in zip(points, points[1:] + points[:1])) // 2
+
+
 def calculate_lagoon_2(instructions):
+    total = 1  # 1 is the starting point
+
     current = (0, 0)
-    visited = set()
-    visited.add(current)
-    for direction, distance, _ in instructions:
-        for d in range(distance):
-            current = current[0] + direction_to_coord[direction][0], current[1] + direction_to_coord[direction][1]
-            visited.add(current)
-    # calculate per 'row'
-    visited = list(sorted(visited))
-    row_idx = 0
-    row = [x for x in visited if x[0] == row_idx]
-    while row:
-        # todo
-        print(row_idx, row)
-        row_idx += 1
-        row = [x for x in visited if x[0] == row_idx]
+    edge_points = [current]
+    for direction, distance in instructions:
+        current = current[0] + direction_to_coord[direction][0] * distance, current[1] + direction_to_coord[direction][
+            1] * distance
+        edge_points.append(current)
+        total += distance / 2
+
+    total += shoelace(edge_points)
+    return int(total)
 
 
 def extract_hex_number(input_string):
@@ -88,13 +88,13 @@ def part_2(problem):
         s = line.strip().split(' ')
         _, _, color = s[0], s[1], s[2]
         h = extract_hex_number(color)
-        instructions.append((hex_digit_to_direction[h[-1]], int(h[:5], 16), color))
+        instructions.append((hex_digit_to_direction[h[-1]], int(h[:5], 16)))
 
     return calculate_lagoon_2(instructions)
 
 
 if __name__ == '__main__':
-    # with open(input_file_name) as problem:
-    #     print(part_1(problem))
+    with open(input_file_name) as problem:
+        print(part_1(problem))
     with open(input_file_name) as problem:
         print(part_2(problem))
