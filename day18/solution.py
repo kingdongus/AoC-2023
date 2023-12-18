@@ -1,7 +1,7 @@
 import re
 
 from toolbox.toolbox import input_file_name, direction_north, direction_west, direction_east, direction_south, \
-    directions_2d_8
+    directions_2d_8, shoelace
 
 direction_to_coord = {
     'U': direction_north,
@@ -38,10 +38,6 @@ def calculate_lagoon_with_flood_fill(instructions):
             if candidate not in visited:
                 work.append(candidate)
     return len(visited)
-
-
-def shoelace(points):
-    return sum((i[0] + j[0]) * (i[1] - j[1]) for i, j in zip(points, points[1:] + points[:1])) // 2
 
 
 def calculate_lagoon_with_shoelace(instructions):

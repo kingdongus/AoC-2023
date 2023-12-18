@@ -13,6 +13,10 @@ directions_2d_8 = [(x, y) for x in [-1, 0, 1] for y in [-1, 0, 1] if not (x == 0
 input_file_name = 'input.txt'
 
 
+def shoelace(points):
+    return sum((i[0] + j[0]) * (i[1] - j[1]) for i, j in zip(points, points[1:] + points[:1])) // 2
+
+
 def manhattan_distance(a, b):
     return abs(a[0] - b[0]) + abs(a[1] - b[1])
 
