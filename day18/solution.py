@@ -17,11 +17,10 @@ def part_1(problem):
         s = line.strip().split(' ')
         direction, distance, _ = s[0], s[1], s[2]
         instructions.append((direction, int(distance)))
+    return calculate_lagoon_with_shoelace(instructions)
 
-    return calculate_lagoon_2(instructions)
 
-
-def calculate_lagoon(instructions):
+def calculate_lagoon_with_flood_fill(instructions):
     current = (0, 0)
     visited = set()
     visited.add(current)
@@ -31,11 +30,7 @@ def calculate_lagoon(instructions):
             visited.add(current)
     # flood fill
     work = [(1, 1)]
-    c = 0
     while work:
-        c += 1
-        if c % 1000000 == 0:
-            print(f'processed: {c}')
         n = work.pop()
         visited.add(n)
         for d in directions_2d_8:
@@ -49,7 +44,7 @@ def shoelace(points):
     return sum((i[0] + j[0]) * (i[1] - j[1]) for i, j in zip(points, points[1:] + points[:1])) // 2
 
 
-def calculate_lagoon_2(instructions):
+def calculate_lagoon_with_shoelace(instructions):
     total = 1  # 1 is the starting point
 
     current = (0, 0)
@@ -90,7 +85,7 @@ def part_2(problem):
         h = extract_hex_number(color)
         instructions.append((hex_digit_to_direction[h[-1]], int(h[:5], 16)))
 
-    return calculate_lagoon_2(instructions)
+    return calculate_lagoon_with_shoelace(instructions)
 
 
 if __name__ == '__main__':
