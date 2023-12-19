@@ -3,6 +3,13 @@ class Range:
         self.start = start
         self.end = end
 
+    def clone(self):
+        return Range(self.start, self.end)
+
+    def split_at(self, at):
+        assert at < self.end
+        return Range(self.start, at), Range(at + 1, self.end)
+
     def overlaps_with(self, other):
         return not (self.start > other.end or self.end < other.start)
 
@@ -78,6 +85,9 @@ class Range:
 
     def __str__(self):
         return self.__repr__()
+
+    def __len__(self):
+        return self.end - self.start + 1
 
 
 if __name__ == '__main__':
