@@ -99,13 +99,8 @@ class ConjunctionModule(Module):
         if self.name == 'zh' and p.type == 'h':
             print(f'zh received h from {p.source} after {button_presses_part_2} presses')
             self.part_2_hack[p.source] = button_presses_part_2
-            done = True
-            for n in (x.name for x in self.incoming):
-                if self.part_2_hack[n] < 1:
-                    done = False
-                    break
             global part_2_done
-            part_2_done |= done
+            part_2_done |= reduce(lambda a, b: a and b, [self.part_2_hack[x.name] > 0 for x in self.incoming], True)
 
         num_high = 0
         for x in self.incoming:
