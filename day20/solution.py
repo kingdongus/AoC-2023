@@ -1,8 +1,11 @@
+import operator
 from collections import defaultdict
+from functools import reduce
 
 from toolbox.toolbox import input_file_name
 
 button_presses_part_2 = 0
+part_2_done = False
 
 
 class Pulse:
@@ -87,6 +90,7 @@ class ConjunctionModule(Module):
     def __init__(self, name):
         super().__init__(name)
         self.last_received_per_incoming = defaultdict(constant_factory('l'))
+        self.part_2_hack = defaultdict(int)
 
     def on_receive_signal(self, p: Pulse):
         # super().on_receive_signal(p)
@@ -94,6 +98,14 @@ class ConjunctionModule(Module):
 
         if self.name == 'zh' and p.type == 'h':
             print(f'zh received h from {p.source} after {button_presses_part_2} presses')
+            self.part_2_hack[p.source] = button_presses_part_2
+            done = True
+            for n in (x.name for x in self.incoming):
+                if self.part_2_hack[n] < 1:
+                    done = False
+                    break
+            global part_2_done
+            part_2_done |= done
 
         num_high = 0
         for x in self.incoming:
@@ -190,8 +202,9 @@ def part_2(problem):
     button.connect_to(module_index['broadcaster'])
 
     global button_presses_part_2
+    global part_2_done
 
-    while module_index['rx'].pulses_sent['l'] == 0:
+    while not part_2_done:
         event_bus = [Pulse('button', 'broadcaster', 'l')]
         while event_bus:
             pulse = event_bus.pop(0)
@@ -199,7 +212,10 @@ def part_2(problem):
             if new_pulses:
                 event_bus += new_pulses
         button_presses_part_2 += 1
-    return None
+
+    print('yay')
+    hack = module_index['zh'].part_2_hack
+    return reduce(operator.mul, [x + 1 for x in hack.values()], 1)
 
 
 if __name__ == '__main__':
