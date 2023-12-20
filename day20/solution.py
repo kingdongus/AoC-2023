@@ -26,9 +26,9 @@ class Module:
         self.incoming = []
         self.pulses_sent = {'l': 0, 'h': 0}
 
-    #
-    # def on_receive_signal(self, p: Pulse):
-    #     print(f'sent: {p.source} -> {p.type} -> {self.name}')
+    def on_receive_signal(self, p: Pulse):
+        # print(f'sent: {p.source} -> {p.type} -> {self.name}')
+        pass
 
     def connect_to(self, other):
         print(f'{self.name} connecting to {other.name}')
@@ -42,14 +42,7 @@ class Sink(Module):
         super().__init__(name)
 
     def on_receive_signal(self, p: Pulse):
-        self.pulses_sent[p.type] += 1
-        # super().on_receive_signal(p)
-        # print(f'doing nothing, {self.name} is a sink...')
-
-    def connect_to(self, other):
-        # print(f'{self.name} connecting to {other.name}')
-        self.outgoing.append(other)
-        other.incoming.append(self)
+        super().on_receive_signal(p)
 
 
 class Broadcaster(Module):
@@ -58,7 +51,7 @@ class Broadcaster(Module):
         super().__init__(name)
 
     def on_receive_signal(self, p: Pulse):
-        # super().on_receive_signal(p)
+        super().on_receive_signal(p)
         self.pulses_sent[p.type] += len(self.outgoing)
         return [Pulse(self.name, c.name, p.type) for c in self.outgoing]
 
@@ -70,7 +63,7 @@ class FlipFlop(Module):
         self.on = False
 
     def on_receive_signal(self, p: Pulse):
-        # super().on_receive_signal(p)
+        super().on_receive_signal(p)
 
         if p.type == 'h':
             return []
@@ -93,7 +86,7 @@ class ConjunctionModule(Module):
         self.part_2_hack = defaultdict(int)
 
     def on_receive_signal(self, p: Pulse):
-        # super().on_receive_signal(p)
+        super().on_receive_signal(p)
         self.last_received_per_incoming[p.source] = p.type
 
         if self.name == 'zh' and p.type == 'h':
@@ -113,64 +106,32 @@ class ConjunctionModule(Module):
         return [Pulse(self.name, c.name, outgoing_pulse_type) for c in self.outgoing]
 
 
-class Button(Module):
-
-    def __init__(self, name):
-        super().__init__(name)
-
-    def on_receive_signal(self, p: Pulse):
-        return [Pulse(self.name, c.name, p.type) for c in self.outgoing]
-
-
 def part_1(problem):
-    modules = []
-    targets = []
-
-    for line in problem:
-        m, t = line.split(' -> ')
-        if m == "broadcaster":
-            modules.append(Broadcaster('broadcaster'))
-        elif '%' in m:
-            modules.append(FlipFlop(m[1:]))
-        elif '&' in m:
-            modules.append(ConjunctionModule(m[1:]))
-        else:
-            print(">>>>>>> OH NO")
-        targets.append(t.strip())
-
-    module_index = {m.name: m for m in modules}
-
-    for m, t in zip(modules, targets):
-        sliced = t.split(',')
-        for s in sliced:
-            k = s.strip()
-            if k not in module_index.keys():
-                module_index[k] = Sink(k)
-            m.connect_to(module_index[s.strip()])
-
-    button = Button('button')
-    button.connect_to(module_index['broadcaster'])
+    module_index = parse_modules(problem)
 
     button_presses = 1000
 
     for _ in range(button_presses):
-        event_bus = [Pulse('button', 'broadcaster', 'l')]
-        while event_bus:
-            pulse = event_bus.pop(0)
-            new_pulses = module_index[pulse.destination].on_receive_signal(pulse)
-            if new_pulses:
-                event_bus += new_pulses
+        process_button_press(module_index)
 
-    low_sent = sum((x.pulses_sent['l'] for x in modules)) + button_presses
-    high_sent = sum((x.pulses_sent['h'] for x in modules))
+    low_sent = sum((x.pulses_sent['l'] for x in module_index.values())) + button_presses
+    high_sent = sum((x.pulses_sent['h'] for x in module_index.values()))
 
     return low_sent * high_sent
 
 
-def part_2(problem):
+def process_button_press(module_index):
+    event_bus = [Pulse('button', 'broadcaster', 'l')]
+    while event_bus:
+        pulse = event_bus.pop(0)
+        new_pulses = module_index[pulse.destination].on_receive_signal(pulse)
+        if new_pulses:
+            event_bus += new_pulses
+
+
+def parse_modules(problem):
     modules = []
     targets = []
-
     for line in problem:
         m, t = line.split(' -> ')
         if m == "broadcaster":
@@ -182,9 +143,7 @@ def part_2(problem):
         else:
             print(">>>>>>> OH NO")
         targets.append(t.strip())
-
     module_index = {m.name: m for m in modules}
-
     for m, t in zip(modules, targets):
         sliced = t.split(',')
         for s in sliced:
@@ -192,25 +151,20 @@ def part_2(problem):
             if k not in module_index.keys():
                 module_index[k] = Sink(k)
             m.connect_to(module_index[s.strip()])
+    return module_index
 
-    button = Button('button')
-    button.connect_to(module_index['broadcaster'])
+
+def part_2(problem):
+    module_index = parse_modules(problem)
 
     global button_presses_part_2
     global part_2_done
 
     while not part_2_done:
-        event_bus = [Pulse('button', 'broadcaster', 'l')]
-        while event_bus:
-            pulse = event_bus.pop(0)
-            new_pulses = module_index[pulse.destination].on_receive_signal(pulse)
-            if new_pulses:
-                event_bus += new_pulses
+        process_button_press(module_index)
         button_presses_part_2 += 1
 
-    print('yay')
-    hack = module_index['zh'].part_2_hack
-    return reduce(operator.mul, [x + 1 for x in hack.values()], 1)
+    return reduce(operator.mul, [x + 1 for x in module_index['zh'].part_2_hack.values()], 1)
 
 
 if __name__ == '__main__':
