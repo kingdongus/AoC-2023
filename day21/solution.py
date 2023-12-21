@@ -1,6 +1,4 @@
-from functools import cache
-
-from toolbox.toolbox import input_file_name, read_file_into_2d_array, in_range, directions_2d_4
+from toolbox.toolbox import input_file_name, read_file_into_2d_array, in_range, directions_2d_4, calculate_quadratic_fit
 
 
 def part_1(problem):
@@ -35,36 +33,29 @@ def part_2(problem):
             if problem[row][col] == 'S':
                 start = (row, col)
 
-    @cache
-    def solve_for_tile(t):
-        temp = []
-        for d in directions_2d_4:
-            candidate_row, candidate_col = (t[0] + d[0], t[1] + d[1])
-            if problem[candidate_row % len(problem)][candidate_col % len(problem[0])] != '#':
-                temp.append((candidate_row, candidate_col))
-        return temp
+    def count_reachable_from_with_n_steps_across_borders(n):
+        reachable_tiles = {start}
+        for _ in range(n):
+            temp = set()
+            while reachable_tiles:
+                next_tile = reachable_tiles.pop()
+                for d in directions_2d_4:
+                    candidate_row, candidate_col = (next_tile[0] + d[0], next_tile[1] + d[1])
+                    if problem[candidate_row % len(problem)][candidate_col % len(problem[0])] != '#':
+                        temp.add((candidate_row, candidate_col))
+            reachable_tiles = temp
+        return len(reachable_tiles)
 
-    @cache
-    def reachable_from_with_n_steps(starting_tiles, n):
-        if n == 0:
-            return starting_tiles
-        tiles = set(starting_tiles)
-        temp = set()
-        while tiles:
-            next_tile = tiles.pop()
-            for t in solve_for_tile(next_tile):
-                temp.add(t)
-        return reachable_from_with_n_steps(tuple(temp), n - 1)
+    len_input_grid = len(problem)
 
-    num_steps = 500
-    reachable_tiles = reachable_from_with_n_steps((start,), num_steps)
+    points = [(i, count_reachable_from_with_n_steps_across_borders(len_input_grid // 2 + i * len_input_grid)) for i in
+              range(3)]
 
-    print(solve_for_tile.cache_info())
-    print(reachable_from_with_n_steps.cache_info())
-    return len(reachable_tiles)
+    num_steps = 26501365
+    return calculate_quadratic_fit(points, num_steps // len_input_grid)
 
 
 if __name__ == '__main__':
     problem = read_file_into_2d_array(input_file_name)
     print(part_1(problem))
-    # print(part_2(problem)) # not done
+    print(part_2(problem))

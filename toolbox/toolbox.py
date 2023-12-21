@@ -1,5 +1,7 @@
 from functools import reduce
 
+import numpy as np
+
 number_strings = [str(i) for i in range(10)]
 
 direction_north = (-1, 0)
@@ -11,6 +13,12 @@ directions_2d_4 = [direction_north, direction_east, direction_south, direction_w
 directions_2d_8 = [(x, y) for x in [-1, 0, 1] for y in [-1, 0, 1] if not (x == 0 and y == 0)]
 
 input_file_name = 'input.txt'
+
+
+# needs n+1 points to fit polynomial of degree n
+def calculate_quadratic_fit(points, x):
+    coefficients = np.polyfit(*zip(*points), 2)
+    return round(np.polyval(coefficients, x))
 
 
 def shoelace(points):
