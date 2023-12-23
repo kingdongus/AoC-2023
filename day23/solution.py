@@ -1,3 +1,4 @@
+from toolbox.Graph import UndirectedGraph
 from toolbox.toolbox import input_file_name, read_file_into_2d_array, directions_2d_4, in_range, direction_east, \
     direction_west, direction_north, direction_south
 
@@ -99,14 +100,48 @@ def find_start_and_end(problem):
     return start, end
 
 
-def part_2(problem):
-    modified_problem = problem[::]
-    for c in range(len(problem)):
-        for r in range(len(problem[0])):
-            if problem[c][r] in '<>^v':
-                modified_problem[c][r] = '.'
+def find_surrounding(location, grid):
+    locations = []
+    for d in directions_2d_4:
+        candidate_row = location[0] + d[0]
+        candidate_col = location[1] + d[1]
+        if (not in_range(candidate_row, grid)
+                or not in_range(candidate_col, grid[0])
+                or grid[candidate_row][candidate_col] == '#'):
+            continue
+        locations.append((candidate_row, candidate_col))
+    return locations
 
-    return part_1(modified_problem)
+
+def part_2(problem):
+    start, end = find_start_and_end(problem)
+    intersections = {start, end}
+    for i in range(len(problem)):
+        for j in range(len(problem[0])):
+            if problem[i][j] != '#' and len(find_surrounding((i, j), problem)) >= 3:
+                intersections.add((i, j))
+
+    graph = build_graph(intersections, problem)
+
+    return graph.get_longest_path(start, end) - 1
+
+
+def build_graph(intersections, problem):
+    graph = UndirectedGraph()
+    for intersection in intersections:
+        dist = {intersection: 0}
+        work = [intersection]
+        while work:
+            current = work.pop()
+            for surrounding in find_surrounding(current, problem):
+                if surrounding in dist.keys():
+                    continue
+                if surrounding in intersections:
+                    graph.add_edge(intersection, surrounding, dist[current] + 1)
+                    continue
+                dist[surrounding] = dist[current] + 1
+                work.append(surrounding)
+    return graph
 
 
 if __name__ == '__main__':
