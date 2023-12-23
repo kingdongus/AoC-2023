@@ -76,25 +76,25 @@ class Rule:
         if not self.condition:
             return [(interval, self.outcome)]
         if self.target == 'x' and self.operator == '<' and interval.x.start < self.value < interval.x.end:
-            t1, t2 = interval.split_at_x(self.value)
+            t1, t2 = interval.split_at_x(self.value - 1)
             return [(t1, self.outcome), (t2,)]
         if self.target == 'x' and self.operator == '>' and interval.x.start < self.value < interval.x.end:
             t1, t2 = interval.split_at_x(self.value)
             return [(t1,), (t2, self.outcome)]
         if self.target == 'm' and self.operator == '<' and interval.m.start < self.value < interval.m.end:
-            t1, t2 = interval.split_at_m(self.value)
+            t1, t2 = interval.split_at_m(self.value - 1)
             return [(t1, self.outcome), (t2,)]
         if self.target == 'm' and self.operator == '>' and interval.m.start < self.value < interval.m.end:
             t1, t2 = interval.split_at_m(self.value)
             return [(t1,), (t2, self.outcome)]
         if self.target == 'a' and self.operator == '<' and interval.a.start < self.value < interval.a.end:
-            t1, t2 = interval.split_at_a(self.value)
+            t1, t2 = interval.split_at_a(self.value - 1)
             return [(t1, self.outcome), (t2,)]
         if self.target == 'a' and self.operator == '>' and interval.a.start < self.value < interval.a.end:
             t1, t2 = interval.split_at_a(self.value)
             return [(t1,), (t2, self.outcome)]
         if self.target == 's' and self.operator == '<' and interval.s.start < self.value < interval.s.end:
-            t1, t2 = interval.split_at_s(self.value)
+            t1, t2 = interval.split_at_s(self.value - 1)
             return [(t1, self.outcome), (t2,)]
         if self.target == 's' and self.operator == '>' and interval.s.start < self.value < interval.s.end:
             t1, t2 = interval.split_at_s(self.value)
@@ -233,4 +233,4 @@ if __name__ == '__main__':
     with open(input_file_name) as problem:
         print(part_2(problem))
         # goal: 167409079868000
-        # real: 167459205617600
+        # real: 167409079868000
