@@ -232,5 +232,3 @@ if __name__ == '__main__':
         print(part_1(problem))
     with open(input_file_name) as problem:
         print(part_2(problem))
-        # goal: 167409079868000
-        # real: 167409079868000
