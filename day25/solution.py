@@ -1,5 +1,7 @@
 from collections import namedtuple
 
+import z3
+
 from toolbox.toolbox import input_file_name
 
 Hailstone = namedtuple('Hailstone', ['x', 'y', 'z'])
@@ -7,14 +9,7 @@ Velocity = namedtuple('Velocity', ['x', 'y', 'z'])
 
 
 def part_1(problem):
-    hailstones_and_velocities = []
-    for line in problem:
-        raw_position, raw_velocity = line.split(' @ ')
-        raw_position = [int(x.strip()) for x in raw_position.split(',')]
-        raw_velocity = [int(x.strip()) for x in raw_velocity.split(',')]
-        hailstone = Hailstone(raw_position[0], raw_position[1], raw_position[2])
-        velocity = Velocity(raw_velocity[0], raw_velocity[1], raw_velocity[2])
-        hailstones_and_velocities.append((hailstone, velocity))
+    hailstones_and_velocities = parse_input(problem)
 
     # x AND y
     test_area_start = 200000000000000
@@ -75,8 +70,33 @@ def part_1(problem):
     return num_intersects
 
 
+def parse_input(problem):
+    hailstones_and_velocities = []
+    for line in problem:
+        raw_position, raw_velocity = line.split(' @ ')
+        raw_position = [int(x.strip()) for x in raw_position.split(',')]
+        raw_velocity = [int(x.strip()) for x in raw_velocity.split(',')]
+        hailstone = Hailstone(raw_position[0], raw_position[1], raw_position[2])
+        velocity = Velocity(raw_velocity[0], raw_velocity[1], raw_velocity[2])
+        hailstones_and_velocities.append((hailstone, velocity))
+    return hailstones_and_velocities
+
+
 def part_2(problem):
-    pass
+    hailstones_and_velocities = parse_input(problem)
+    # just need 3 lines of input, each hailstone has 3 equations
+    extracted = [(h.x, h.y, h.z, v.x, v.y, v.z) for (h, v) in
+                 hailstones_and_velocities[:3]]
+    hxi, hyi, hzi, vxi, vyi, vzi = z3.Ints("hxi hyi hzi vxi vyi vzi")
+    ts = z3.Ints('t1 t2 t3')
+
+    s = z3.Solver()
+    for i, (hx, hy, hz, vx, vy, vz) in enumerate(extracted):
+        s.add(hx + vx * ts[i] == hxi + vxi * ts[i])
+        s.add(hy + vy * ts[i] == hyi + vyi * ts[i])
+        s.add(hz + vz * ts[i] == hzi + vzi * ts[i])
+    s.check()
+    return s.model().evaluate(hxi + hyi + hzi)
 
 
 if __name__ == '__main__':
